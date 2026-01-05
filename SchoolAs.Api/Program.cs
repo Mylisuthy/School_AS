@@ -112,17 +112,27 @@ builder.Services.AddSwaggerGen(c =>
 // 5. CORS Configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")?.Split(',', StringSplitOptions.RemoveEmptyEntries) 
-                                 ?? new[] { "http://localhost:5173", "http://localhost:3000" };
+            options.AddPolicy("AllowFrontend",
+                policy =>
+                {
+                    var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")?.Split(',', StringSplitOptions.RemoveEmptyEntries) 
+                                         ?? new[] { "http://localhost:5173", "http://localhost:3000" };
 
-            policy.WithOrigins(allowedOrigins)
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials();
-        });
+                    if (allowedOrigins.Contains("*"))
+                    {
+                        policy.SetIsOriginAllowed(origin => true) // Helper to allow specific origin reflection for *
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                    }
+                    else
+                    {
+                        policy.WithOrigins(allowedOrigins)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                    }
+                });
 });
 
 var app = builder.Build();
