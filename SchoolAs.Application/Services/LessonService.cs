@@ -25,33 +25,50 @@ namespace SchoolAs.Application.Services
             _userLessonProgressRepository = userLessonProgressRepository;
         }
 
-        public async Task<IEnumerable<LessonDto>> GetByCourseIdAsync(Guid courseId)
+        public async Task<IEnumerable<LessonDto>> GetByCourseIdAsync(Guid courseId, string? userId = null)
         {
             var lessons = await _lessonRepository.GetByCourseIdAsync(courseId);
+            
+            HashSet<Guid> completedLessonIds = new HashSet<Guid>();
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var progress = await _userLessonProgressRepository.GetByUserIdAsync(userId);
+                // Filter by relevant lessons to be safe, though ID check is enough
+                completedLessonIds = progress.Where(p => p.IsCompleted).Select(p => p.LessonId).ToHashSet();
+            }
+
             return lessons.Select(l => new LessonDto
             {
                 Id = l.Id,
                 CourseId = l.CourseId,
                 Title = l.Title,
-                Content = l.Content,   // New
-                VideoUrl = l.VideoUrl, // New
-                Order = l.Order
+                Content = l.Content,
+                VideoUrl = l.VideoUrl,
+                Order = l.Order,
+                IsCompleted = completedLessonIds.Contains(l.Id)
             });
         }
 
-        public async Task<LessonDto?> GetByIdAsync(Guid id)
+        public async Task<LessonDto?> GetByIdAsync(Guid id, string? userId = null)
         {
             var lesson = await _lessonRepository.GetByIdAsync(id);
             if (lesson == null) return null;
+
+            bool isCompleted = false;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                isCompleted = await IsLessonCompletedAsync(id, userId);
+            }
 
             return new LessonDto
             {
                 Id = lesson.Id,
                 CourseId = lesson.CourseId,
                 Title = lesson.Title,
-                Content = lesson.Content,   // New
-                VideoUrl = lesson.VideoUrl, // New
-                Order = lesson.Order
+                Content = lesson.Content,
+                VideoUrl = lesson.VideoUrl,
+                Order = lesson.Order,
+                IsCompleted = isCompleted
             };
         }
 

@@ -22,7 +22,16 @@ namespace SchoolAs.Api.Controllers
         [HttpGet("course/{courseId}")]
         public async Task<ActionResult<IEnumerable<LessonDto>>> GetByCourseId(Guid courseId)
         {
-            var lessons = await _lessonService.GetByCourseIdAsync(courseId);
+            var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+            string? userId = null;
+            
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                userId = user?.Id;
+            }
+
+            var lessons = await _lessonService.GetByCourseIdAsync(courseId, userId);
             return Ok(lessons);
         }
 
@@ -43,7 +52,16 @@ namespace SchoolAs.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<LessonDto>> GetById(Guid id)
         {
-            var lesson = await _lessonService.GetByIdAsync(id);
+            var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+            string? userId = null;
+            
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                userId = user?.Id;
+            }
+
+            var lesson = await _lessonService.GetByIdAsync(id, userId);
             if (lesson == null) return NotFound();
             return Ok(lesson);
         }
