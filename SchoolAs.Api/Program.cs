@@ -18,6 +18,17 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") 
                        ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
+// Fix for Render/Heroku postgres:// URL format
+if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+{
+    var databaseUri = new Uri(connectionString);
+    var userInfo = databaseUri.UserInfo.Split(':');
+    var userId = userInfo[0];
+    var password = userInfo.Length > 1 ? userInfo[1] : "";
+
+    connectionString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.AbsolutePath.TrimStart('/')};Username={userId};Password={password};Ssl Mode=Require;Trust Server Certificate=true";
+}
+
 // If using Aiven or explicit env vars construction
 var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
 if (!string.IsNullOrEmpty(dbHost))
