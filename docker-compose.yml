@@ -13,6 +13,7 @@ services:
       - DB_NAME=school_as
       - DB_USER=postgres
       - DB_PASSWORD=password
+      - DB_SSL_MODE=Disable
     depends_on:
       - postgres-db
     networks:
