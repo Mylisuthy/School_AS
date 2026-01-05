@@ -14,6 +14,9 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=password
       - DB_SSL_MODE=Disable
+      - JWT_SECRET=Th1sIsASup3rS3cr3tKeyF0rSch00lAsProject!
+      - JWT_ISSUER=SchoolAsApi
+      - JWT_AUDIENCE=SchoolAsClients
     depends_on:
       - postgres-db
     networks:
