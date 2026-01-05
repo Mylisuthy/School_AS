@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\webEscuela.Application\webEscuela.Application.csproj" />
-    <ProjectReference Include="..\webEscuela.Infrastructure\webEscuela.Infrastructure.csproj" />
+    <ProjectReference Include="..\SchoolAs.Application\SchoolAs.Application.csproj" />
+    <ProjectReference Include="..\SchoolAs.Infrastructure\SchoolAs.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

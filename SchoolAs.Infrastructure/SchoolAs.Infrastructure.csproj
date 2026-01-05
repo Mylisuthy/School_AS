@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\webEscuela.Domain\webEscuela.Domain.csproj" />
+    <ProjectReference Include="..\SchoolAs.Domain\SchoolAs.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
