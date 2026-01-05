@@ -8,21 +8,30 @@ services:
       - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_NAME=school_as
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_SSL_MODE=Disable
-      - JWT_SECRET=Th1sIsASup3rS3cr3tKeyF0rSch00lAsProject!
+      - DB_CONNECTION_STRING=Host=db;Port=5432;Database=school_as;Username=postgres;Password=password;Ssl Mode=Disable
+      - JWT_SECRET=SecretKeyMustBeLongEnough1234567890
       - JWT_ISSUER=SchoolAsApi
-      - JWT_AUDIENCE=SchoolAsClients
+      - JWT_AUDIENCE=SchoolAsClient
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
     depends_on:
-      - postgres-db
+      - db
     networks:
       - schoolas-network
 
-  postgres-db:
+  schoolas-web:
+    build:
+      context: ./SchoolAs.Web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - schoolas-api
+    networks:
+      - schoolas-network
+
+  db:
     image: postgres:15-alpine
     restart: always
     environment:
