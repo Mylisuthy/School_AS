@@ -28,6 +28,8 @@ namespace SchoolAs.Application.Services
             {
                 Id = c.Id,
                 Title = c.Title,
+                Description = c.Description, // New
+                ImageUrl = c.ImageUrl,       // New
                 Status = c.Status,
                 CreatedAt = c.CreatedAt,
                 UpdatedAt = c.UpdatedAt
@@ -43,6 +45,8 @@ namespace SchoolAs.Application.Services
             {
                 Id = course.Id,
                 Title = course.Title,
+                Description = course.Description, // New
+                ImageUrl = course.ImageUrl,       // New
                 Status = course.Status,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt
@@ -54,6 +58,8 @@ namespace SchoolAs.Application.Services
             var course = new Course
             {
                 Title = dto.Title,
+                Description = dto.Description, // New
+                ImageUrl = dto.ImageUrl,       // New
                 Status = CourseStatus.Draft
             };
 
@@ -63,6 +69,8 @@ namespace SchoolAs.Application.Services
             {
                 Id = course.Id,
                 Title = course.Title,
+                Description = course.Description, // New
+                ImageUrl = course.ImageUrl,       // New
                 Status = course.Status,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt
@@ -75,6 +83,8 @@ namespace SchoolAs.Application.Services
             if (course == null) throw new Exception("Course not found");
 
             course.Title = dto.Title;
+            course.Description = dto.Description; // New
+            course.ImageUrl = dto.ImageUrl;       // New
             await _courseRepository.UpdateAsync(course);
         }
 

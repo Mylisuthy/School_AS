@@ -28,6 +28,8 @@ namespace SchoolAs.Application.Services
                 Id = l.Id,
                 CourseId = l.CourseId,
                 Title = l.Title,
+                Content = l.Content,   // New
+                VideoUrl = l.VideoUrl, // New
                 Order = l.Order
             });
         }
@@ -42,6 +44,8 @@ namespace SchoolAs.Application.Services
                 Id = lesson.Id,
                 CourseId = lesson.CourseId,
                 Title = lesson.Title,
+                Content = lesson.Content,   // New
+                VideoUrl = lesson.VideoUrl, // New
                 Order = lesson.Order
             };
         }
@@ -58,6 +62,8 @@ namespace SchoolAs.Application.Services
             {
                 CourseId = dto.CourseId,
                 Title = dto.Title,
+                Content = dto.Content,   // New
+                VideoUrl = dto.VideoUrl, // New
                 Order = dto.Order
             };
 
@@ -68,6 +74,8 @@ namespace SchoolAs.Application.Services
                 Id = lesson.Id,
                 CourseId = lesson.CourseId,
                 Title = lesson.Title,
+                Content = lesson.Content,   // New
+                VideoUrl = lesson.VideoUrl, // New
                 Order = lesson.Order
             };
         }
@@ -88,6 +96,8 @@ namespace SchoolAs.Application.Services
             }
 
             lesson.Title = dto.Title;
+            lesson.Content = dto.Content;   // New
+            lesson.VideoUrl = dto.VideoUrl; // New
             lesson.Order = dto.Order;
             await _lessonRepository.UpdateAsync(lesson);
         }

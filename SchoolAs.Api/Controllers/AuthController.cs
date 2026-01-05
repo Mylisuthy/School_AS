@@ -47,6 +47,13 @@ namespace SchoolAs.Api.Controllers
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
+                // Add User Roles to Claims
+                var userRoles = await _userManager.GetRolesAsync(user);
+                foreach (var role in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, role));
+                }
+
                 // Use Environment Variables directly to match Program.cs logic exactly
                 var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? _configuration["Jwt:Secret"] ?? "SecretKeyMustBeLongEnough1234567890";
                 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _configuration["Jwt:Issuer"];

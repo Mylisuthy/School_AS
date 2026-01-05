@@ -12,33 +12,36 @@ namespace SchoolAs.Infrastructure.Persistence
 
         public DbSet<Course> Courses { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
+        public DbSet<UserCourse> UserCourses { get; set; } // New
+        public DbSet<UserLessonProgress> UserLessonProgresses { get; set; } // New
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
 
-            // Global Query Filter for Soft Delete
-            builder.Entity<Course>().HasQueryFilter(c => !c.IsDeleted);
-            builder.Entity<Lesson>().HasQueryFilter(l => !l.IsDeleted);
+            // Global Query Filters (Soft Delete)
+            modelBuilder.Entity<Course>().HasQueryFilter(c => !c.IsDeleted);
+            modelBuilder.Entity<Lesson>().HasQueryFilter(l => !l.IsDeleted);
 
-            // Configurations
-            builder.Entity<Course>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
-            });
+            // Unique Order constraint per Course (for non-deleted lessons)
+            modelBuilder.Entity<Lesson>()
+                .HasIndex(l => new { l.CourseId, l.Order })
+                .IsUnique()
+                .HasFilter("\"IsDeleted\" = false");
 
-            builder.Entity<Lesson>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
-                entity.HasIndex(e => new { e.CourseId, e.Order }).IsUnique().HasFilter("\"IsDeleted\" = false");
-                
-                entity.HasOne(d => d.Course)
-                    .WithMany(p => p.Lessons)
-                    .HasForeignKey(d => d.CourseId)
-                    .OnDelete(DeleteBehavior.Restrict); // Logical delete, so restrict physical delete
-            });
+            // UserCourse Configuration
+            modelBuilder.Entity<UserCourse>()
+                .HasOne(uc => uc.Course)
+                .WithMany(c => c.Enrollments)
+                .HasForeignKey(uc => uc.CourseId);
+
+            // UserLessonProgress Configuration
+            modelBuilder.Entity<UserLessonProgress>()
+                .HasOne(ulp => ulp.Lesson)
+                .WithMany(l => l.UserProgress)
+                .HasForeignKey(ulp => ulp.LessonId);
         }
+    }
+}
     }
 }
