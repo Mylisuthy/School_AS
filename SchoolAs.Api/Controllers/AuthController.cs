@@ -47,11 +47,16 @@ namespace SchoolAs.Api.Controllers
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT_SECRET"] ?? "SecretKeyMustBeLongEnough1234567890"));
+                // Use Environment Variables directly to match Program.cs logic exactly
+                var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? _configuration["Jwt:Secret"] ?? "SecretKeyMustBeLongEnough1234567890";
+                var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _configuration["Jwt:Issuer"];
+                var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? _configuration["Jwt:Audience"];
+
+                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
 
                 var token = new JwtSecurityToken(
-                    issuer: _configuration["JWT_ISSUER"],
-                    audience: _configuration["JWT_AUDIENCE"],
+                    issuer: jwtIssuer,
+                    audience: jwtAudience,
                     expires: DateTime.Now.AddHours(3),
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
