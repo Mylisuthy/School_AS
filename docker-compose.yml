@@ -5,16 +5,27 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5000:8080"
+      - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_NAME=school_as
-      - DB_USER=postgres
-      - DB_PASSWORD=password
+      - ConnectionStrings__DefaultConnection=Host=postgres-db;Database=SchoolAsDb;Username=postgres;Password=password
+      - JWT_SECRET=ThisIsASecretKeyForJwtAuthentication1234567890
+      - JWT_ISSUER=SchoolAsApi
+      - JWT_AUDIENCE=SchoolAsUser
     depends_on:
       - postgres-db
+    networks:
+      - schoolas-network
+
+  schoolas-web:
+    image: schoolas-web
+    build:
+      context: ./SchoolAs.Web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - schoolas-api
     networks:
       - schoolas-network
 
@@ -23,7 +34,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: school_as
+      POSTGRES_DB: SchoolAsDb
     ports:
       - "5432:5432"
     volumes:
