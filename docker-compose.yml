@@ -19,7 +19,8 @@ services:
       - schoolas-network
 
   postgres-db:
-    image: postgres:latest
+    image: postgres:15-alpine
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -33,6 +34,7 @@ services:
 
 volumes:
   postgres-data:
+
 
 networks:
   schoolas-network:

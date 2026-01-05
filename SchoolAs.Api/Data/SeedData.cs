@@ -10,21 +10,40 @@ namespace SchoolAs.Api.Data
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
-            // Ensure database is created
-            context.Database.EnsureCreated();
+            int maxRetries = 10;
+            int delaySeconds = 2;
 
-            // Seed User
-            var testUserEmail = "test@schoolas.com";
-            var testUser = await userManager.FindByEmailAsync(testUserEmail);
-            if (testUser == null)
+            for (int i = 0; i < maxRetries; i++)
             {
-                testUser = new IdentityUser
+                try
                 {
-                    UserName = testUserEmail,
-                    Email = testUserEmail,
-                    EmailConfirmed = true
-                };
-                await userManager.CreateAsync(testUser, "Password123!");
+                    // Ensure database is created
+                    context.Database.EnsureCreated();
+
+                    // Seed User
+                    var testUserEmail = "test@schoolas.com";
+                    var testUser = await userManager.FindByEmailAsync(testUserEmail);
+                    if (testUser == null)
+                    {
+                        testUser = new IdentityUser
+                        {
+                            UserName = testUserEmail,
+                            Email = testUserEmail,
+                            EmailConfirmed = true
+                        };
+                        await userManager.CreateAsync(testUser, "Password123!");
+                    }
+                    
+                    // If successful, break the loop
+                    return; 
+                }
+                catch (Exception ex)
+                {
+                    if (i == maxRetries - 1) throw; // Throw on last attempt
+                    
+                    Console.WriteLine($"DB Connection failed (Attempt {i + 1}/{maxRetries}). Retrying in {delaySeconds}s... Error: {ex.Message}");
+                    await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
+                }
             }
         }
     }
