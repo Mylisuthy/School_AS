@@ -16,21 +16,21 @@ This is the Backend API for the School_AS course management platform. It is buil
 - **Data Seeding**: Test user (`test@schoolas.com`) created on startup.
 
 ## Prerequisites
-- .NET 8 SDK
-- PostgreSQL
-- Docker (Optional)
+- Docker (Recommended)
+- OR .NET 8 SDK + PostgreSQL
 
 ## Running the Application
 
 ### Option 1: Docker (Recommended)
-Run the full stack (Backend + DB + Frontend):
-```bash
-docker-compose up --build
-```
-*Note: If you encounter permission errors, try `sudo docker-compose up --build`.*
+This repository contains the `docker-compose` setup for the **Backend API** and **Database**.
 
-- **API**: [http://localhost:8080/swagger](http://localhost:8080/swagger)
-- **Frontend**: [http://localhost:3000](http://localhost:3000)
+1. Run the stack:
+   ```bash
+   sudo docker-compose up --build
+   ```
+2. Access the API Documentation:
+   - URL: [http://localhost:5000/swagger](http://localhost:5000/swagger)
+   - *Note: mapped to port 5000 on host.*
 
 ### Option 2: Local .NET CLI
 1. Configure `appsettings.json` with your PostgreSQL connection string.
@@ -38,6 +38,10 @@ docker-compose up --build
    ```bash
    dotnet run --project SchoolAs.Api
    ```
+   (Default port usually 8080 or 5000 check console output).
+
+## Connecting the Frontend
+To use the UI, clone the [Frontend Repository](https://github.com/Mylisuthy/School_AS_Frontend.git) and run it locally, pointing it to `http://localhost:5000/api`.
 
 ## Branches
 - `Develop`: Main development branch.
