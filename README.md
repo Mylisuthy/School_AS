@@ -32,21 +32,44 @@ This repository contains the `docker-compose` setup for the **Backend API** and 
    - URL: [http://localhost:5000/swagger](http://localhost:5000/swagger)
    - *Note: mapped to port 5000 on host.*
 
-### Option 2: Local .NET CLI
-1. Configure `appsettings.json` with your PostgreSQL connection string.
-2. Run the API:
-   ```bash
-   dotnet run --project SchoolAs.Api
-   ```
-   (Default port usually 8080 or 5000 check console output).
+## Configuration & Database
 
-## Connecting the Frontend
-To use the UI, clone the [Frontend Repository](https://github.com/Mylisuthy/School_AS_Frontend.git) and run it locally, pointing it to `http://localhost:5000/api`.
+### Database Connection
+- **Docker**: Automatically configured via environment variables in `docker-compose.yml`.
+- **Local Development**: Update `appsettings.json` with your PostgreSQL connection string:
+  ```json
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=school_as;Username=postgres;Password=your_password;Ssl Mode=Disable"
+  }
+  ```
 
-## Branches
-- `Develop`: Main development branch.
-- `Test`: Staging/Verification branch.
+### Migrations
+The application is configured to **automatically assign migrations** on startup (`Program.cs`).
+To run them manually:
+```bash
+dotnet ef database update --project SchoolAs.Infrastructure --startup-project SchoolAs.Api
+```
 
-## Test Credentials
-- **Email**: `test@schoolas.com`
-- **Password**: `Password123!`
+## Running the Project
+
+### Option 1: Docker (Recommended) 🐳
+The easiest way to run the full stack (API + Database + Frontend).
+```bash
+docker-compose up --build
+```
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:5000/swagger](http://localhost:5000/swagger)
+
+### Option 2: Manual Run
+1. Start PostgreSQL.
+2. Run Backend: `dotnet run --project SchoolAs.Api`
+3. Run Frontend: `npm run dev` (in `SchoolAs.Web`)
+
+## Test Credentials 🔑
+
+The system automatically creates these users on startup:
+
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** | `test@schoolas.com` | `Password123!` |
+| **Student** | `student@schoolas.com` | `Password123!` |
