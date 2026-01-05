@@ -3,20 +3,17 @@ using SchoolAs.Domain.Common;
 
 namespace SchoolAs.Domain.Entities
 {
-    public class Lesson
+    public class Lesson : BaseEntity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        // Inherited: Id, IsDeleted, CreatedAt, UpdatedAt
         public Guid CourseId { get; set; }
         public string Title { get; set; } = string.Empty;
-        public string Content { get; set; } = string.Empty; // New (Rich Text)
-        public string VideoUrl { get; set; } = string.Empty; // New
+        public string Content { get; set; } = string.Empty; 
+        public string VideoUrl { get; set; } = string.Empty; 
         public int Order { get; set; }
-        public bool IsDeleted { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation Property
         public Course? Course { get; set; }
-        public ICollection<UserLessonProgress> UserProgress { get; set; } = new List<UserLessonProgress>(); // New
+        public ICollection<UserLessonProgress> UserProgress { get; set; } = new List<UserLessonProgress>();
     }
 }

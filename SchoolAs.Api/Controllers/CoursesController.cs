@@ -12,10 +12,12 @@ namespace SchoolAs.Api.Controllers
     public class CoursesController : ControllerBase
     {
         private readonly ICourseService _courseService;
+        private readonly Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> _userManager;
 
-        public CoursesController(ICourseService courseService)
+        public CoursesController(ICourseService courseService, Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> userManager)
         {
             _courseService = courseService;
+            _userManager = userManager;
         }
 
         [HttpGet("search")]
@@ -30,7 +32,43 @@ namespace SchoolAs.Api.Controllers
         {
             var course = await _courseService.GetByIdAsync(id);
             if (course == null) return NotFound();
+
+            // Enrich with Enrollment Status
+            var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                 var user = await _userManager.FindByEmailAsync(userEmail);
+                 if (user != null)
+                 {
+                    course.IsEnrolled = await _courseService.IsEnrolledAsync(id, user.Id);
+                 }
+            }
+
             return Ok(course);
+        }
+
+        [HttpPost("{id}/enroll")]
+        public async Task<IActionResult> Enroll(Guid id)
+        {
+            try
+            {
+                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+                if (string.IsNullOrEmpty(userEmail)) return Unauthorized();
+
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                if (user == null) return Unauthorized();
+
+                await _courseService.EnrollStudentAsync(id, user.Id); 
+                return Ok(new { Message = "Enrolled successfully" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost]

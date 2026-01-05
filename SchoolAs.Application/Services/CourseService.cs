@@ -14,12 +14,19 @@ namespace SchoolAs.Application.Services
     {
         private readonly ICourseRepository _courseRepository;
         private readonly ILessonRepository _lessonRepository;
+        private readonly IUserCourseRepository _userCourseRepository; // New
 
-        public CourseService(ICourseRepository courseRepository, ILessonRepository lessonRepository)
+        public CourseService(
+            ICourseRepository courseRepository, 
+            ILessonRepository lessonRepository,
+            IUserCourseRepository userCourseRepository) // Updated Constructor
         {
             _courseRepository = courseRepository;
             _lessonRepository = lessonRepository;
+            _userCourseRepository = userCourseRepository;
         }
+
+        // ... existing methods ...
 
         public async Task<IEnumerable<CourseDto>> GetCoursesAsync(int page, int pageSize, CourseStatus? status, string? searchTerm)
         {
@@ -28,8 +35,8 @@ namespace SchoolAs.Application.Services
             {
                 Id = c.Id,
                 Title = c.Title,
-                Description = c.Description, // New
-                ImageUrl = c.ImageUrl,       // New
+                Description = c.Description,
+                ImageUrl = c.ImageUrl,
                 Status = c.Status,
                 CreatedAt = c.CreatedAt,
                 UpdatedAt = c.UpdatedAt
@@ -45,8 +52,8 @@ namespace SchoolAs.Application.Services
             {
                 Id = course.Id,
                 Title = course.Title,
-                Description = course.Description, // New
-                ImageUrl = course.ImageUrl,       // New
+                Description = course.Description,
+                ImageUrl = course.ImageUrl,
                 Status = course.Status,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt
@@ -58,8 +65,8 @@ namespace SchoolAs.Application.Services
             var course = new Course
             {
                 Title = dto.Title,
-                Description = dto.Description, // New
-                ImageUrl = dto.ImageUrl,       // New
+                Description = dto.Description,
+                ImageUrl = dto.ImageUrl,
                 Status = CourseStatus.Draft
             };
 
@@ -69,8 +76,8 @@ namespace SchoolAs.Application.Services
             {
                 Id = course.Id,
                 Title = course.Title,
-                Description = course.Description, // New
-                ImageUrl = course.ImageUrl,       // New
+                Description = course.Description,
+                ImageUrl = course.ImageUrl,
                 Status = course.Status,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt
@@ -83,8 +90,8 @@ namespace SchoolAs.Application.Services
             if (course == null) throw new Exception("Course not found");
 
             course.Title = dto.Title;
-            course.Description = dto.Description; // New
-            course.ImageUrl = dto.ImageUrl;       // New
+            course.Description = dto.Description;
+            course.ImageUrl = dto.ImageUrl;
             await _courseRepository.UpdateAsync(course);
         }
 
@@ -131,6 +138,32 @@ namespace SchoolAs.Application.Services
                 TotalLessons = lessons.Count(),
                 LastUpdatedAt = course.UpdatedAt
             };
+        }
+
+        public async Task EnrollStudentAsync(Guid courseId, string userId)
+        {
+             var course = await _courseRepository.GetByIdAsync(courseId);
+             if (course == null) throw new Exception("Course not found");
+
+             if (await IsEnrolledAsync(courseId, userId))
+             {
+                 throw new InvalidOperationException("User is already enrolled in this course.");
+             }
+
+             var enrollment = new UserCourse
+             {
+                 UserId = userId,
+                 CourseId = courseId,
+                 EnrollmentDate = DateTime.UtcNow
+             };
+
+             await _userCourseRepository.AddAsync(enrollment);
+        }
+
+        public async Task<bool> IsEnrolledAsync(Guid courseId, string userId)
+        {
+             var enrollment = await _userCourseRepository.GetByUserAndCourseAsync(userId, courseId);
+             return enrollment != null;
         }
     }
 }

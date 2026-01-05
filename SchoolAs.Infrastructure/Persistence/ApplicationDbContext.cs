@@ -43,5 +43,4 @@ namespace SchoolAs.Infrastructure.Persistence
         }
     }
 }
-    }
-}
+

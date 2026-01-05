@@ -70,6 +70,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<IUserCourseRepository, UserCourseRepository>(); // New
+builder.Services.AddScoped<IUserLessonProgressRepository, UserLessonProgressRepository>(); // New
 
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
@@ -165,7 +167,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        // context.Database.Migrate(); // Uncomment to auto-migrate
+        // context.Database.Migrate(); 
+        await context.Database.EnsureCreatedAsync(); // Bypass migrations for dev
         
         await SchoolAs.Api.Data.SeedData.InitializeAsync(services);
     }

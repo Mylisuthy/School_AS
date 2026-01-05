@@ -1,16 +1,15 @@
-using Microsoft.AspNetCore.Identity;
+using SchoolAs.Domain.Common;
 
 namespace SchoolAs.Domain.Entities
 {
-    public class UserCourse
+    public class UserCourse : BaseEntity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        // Id, IsDeleted, CreatedAt, UpdatedAt inherited
         public string UserId { get; set; } = string.Empty;
         public Guid CourseId { get; set; }
         public DateTime EnrollmentDate { get; set; } = DateTime.UtcNow;
 
         // Navigation Properties
-        public IdentityUser User { get; set; }
         public Course Course { get; set; }
     }
 }

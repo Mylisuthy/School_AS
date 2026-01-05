@@ -11,10 +11,12 @@ namespace SchoolAs.Api.Controllers
     public class LessonsController : ControllerBase
     {
         private readonly ILessonService _lessonService;
+        private readonly Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> _userManager;
 
-        public LessonsController(ILessonService lessonService)
+        public LessonsController(ILessonService lessonService, Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> userManager)
         {
             _lessonService = lessonService;
+            _userManager = userManager;
         }
 
         [HttpGet("course/{courseId}")]
@@ -64,11 +66,30 @@ namespace SchoolAs.Api.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             await _lessonService.DeleteAsync(id);
             return NoContent();
+        }
+
+        [HttpPost("{id}/complete")]
+        public async Task<IActionResult> Complete(Guid id)
+        {
+            try
+            {
+                var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+                if (string.IsNullOrEmpty(userEmail)) return Unauthorized();
+
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                if (user == null) return Unauthorized();
+                 
+                await _lessonService.MarkLessonCompleteAsync(id, user.Id);
+                return Ok(new { Message = "Lesson completed" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
         }
 
         [HttpPost("course/{courseId}/reorder")]

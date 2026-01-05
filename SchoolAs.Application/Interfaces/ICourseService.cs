@@ -14,7 +14,10 @@ namespace SchoolAs.Application.Interfaces
         Task UpdateAsync(Guid id, UpdateCourseDto dto);
         Task DeleteAsync(Guid id);
         Task PublishAsync(Guid id);
+
         Task UnpublishAsync(Guid id);
         Task<CourseSummaryDto?> GetSummaryAsync(Guid id);
+        Task EnrollStudentAsync(Guid courseId, string userId); // New
+        Task<bool> IsEnrolledAsync(Guid courseId, string userId); // New
     }
 }

@@ -1,17 +1,16 @@
-using Microsoft.AspNetCore.Identity;
+using SchoolAs.Domain.Common;
 
 namespace SchoolAs.Domain.Entities
 {
-    public class UserLessonProgress
+    public class UserLessonProgress : BaseEntity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        // Id, IsDeleted, CreatedAt, UpdatedAt inherited
         public string UserId { get; set; } = string.Empty;
         public Guid LessonId { get; set; }
         public bool IsCompleted { get; set; } = false;
         public DateTime? CompletedAt { get; set; }
 
         // Navigation Properties
-        public IdentityUser User { get; set; }
         public Lesson Lesson { get; set; }
     }
 }

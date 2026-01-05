@@ -13,5 +13,7 @@ namespace SchoolAs.Application.Interfaces
         Task UpdateAsync(Guid id, UpdateLessonDto dto);
         Task DeleteAsync(Guid id);
         Task ReorderAsync(Guid courseId, List<Guid> lessonIdsInOrder); // Simplified reordering
+        Task MarkLessonCompleteAsync(Guid lessonId, string userId); // New
+        Task<bool> IsLessonCompletedAsync(Guid lessonId, string userId); // New
     }
 }

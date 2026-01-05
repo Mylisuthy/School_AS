@@ -13,11 +13,16 @@ namespace SchoolAs.Application.Services
     {
         private readonly ILessonRepository _lessonRepository;
         private readonly ICourseRepository _courseRepository;
+        private readonly IUserLessonProgressRepository _userLessonProgressRepository; // New
 
-        public LessonService(ILessonRepository lessonRepository, ICourseRepository courseRepository)
+        public LessonService(
+            ILessonRepository lessonRepository, 
+            ICourseRepository courseRepository,
+            IUserLessonProgressRepository userLessonProgressRepository) // Updated Constructor
         {
             _lessonRepository = lessonRepository;
             _courseRepository = courseRepository;
+            _userLessonProgressRepository = userLessonProgressRepository;
         }
 
         public async Task<IEnumerable<LessonDto>> GetByCourseIdAsync(Guid courseId)
@@ -123,16 +128,54 @@ namespace SchoolAs.Application.Services
                 throw new ArgumentException("Duplicate lesson IDs in order list.");
             }
 
-            // Update orders
+            // 1. Assign temporary negative orders to avoid Unique Constraint violations during swaps
+            // e.g., swapping 1 and 2:
+            // If we try set 1 -> 2, it fails because 2 exists.
+            
+            // Transaction-like behavior would be better, but with immediate SaveChanges in Repo, we need this workaround.
+            foreach (var lesson in lessons)
+            {
+                lesson.Order = -1 * lesson.Order; // Temp negative
+                await _lessonRepository.UpdateAsync(lesson); 
+            }
+
+            // 2. Assign desired positive orders
             for (int i = 0; i < lessonIdsInOrder.Count; i++)
             {
                 var lesson = lessons.FirstOrDefault(l => l.Id == lessonIdsInOrder[i]);
                 if (lesson != null)
                 {
-                    lesson.Order = i + 1; // 1-based order
+                    lesson.Order = i + 1;
                     await _lessonRepository.UpdateAsync(lesson);
                 }
             }
+        }
+
+        public async Task MarkLessonCompleteAsync(Guid lessonId, string userId)
+        {
+             var lesson = await _lessonRepository.GetByIdAsync(lessonId);
+             if (lesson == null) throw new Exception("Lesson not found");
+
+             if (await IsLessonCompletedAsync(lessonId, userId))
+             {
+                 return; // Already completed, idempotent
+             }
+
+             var progress = new UserLessonProgress
+             {
+                 UserId = userId,
+                 LessonId = lessonId,
+                 IsCompleted = true,
+                 CompletedAt = DateTime.UtcNow
+             };
+
+             await _userLessonProgressRepository.AddAsync(progress);
+        }
+
+        public async Task<bool> IsLessonCompletedAsync(Guid lessonId, string userId)
+        {
+             var progress = await _userLessonProgressRepository.GetByUserAndLessonAsync(userId, lessonId);
+             return progress != null && progress.IsCompleted;
         }
     }
 }
