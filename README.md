@@ -29,8 +29,8 @@ This repository contains the `docker-compose` setup for the **Backend API** and 
    sudo docker-compose up --build
    ```
 2. Access the API Documentation:
-   - URL: [http://localhost:5000/swagger](http://localhost:5000/swagger)
-   - *Note: mapped to port 5000 on host.*
+   - URL: [http://localhost:15000/swagger](http://localhost:15000/swagger)
+   - *Note: mapped to port 15000 on host.*
 
 ## Configuration & Database
 
@@ -39,7 +39,7 @@ This repository contains the `docker-compose` setup for the **Backend API** and 
 - **Local Development**: Update `appsettings.json` with your PostgreSQL connection string:
   ```json
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=school_as;Username=postgres;Password=your_password;Ssl Mode=Disable"
+    "DefaultConnection": "Host=localhost;Port=15432;Database=school_as;Username=postgres;Password=your_password;Ssl Mode=Disable"
   }
   ```
 
@@ -57,8 +57,8 @@ The easiest way to run the full stack (API + Database + Frontend).
 ```bash
 docker-compose up --build
 ```
-- **Frontend**: [http://localhost:3000](http://localhost:3000)
-- **Backend API**: [http://localhost:5000/swagger](http://localhost:5000/swagger)
+- **Frontend**: [http://localhost:13000](http://localhost:13000)
+- **Backend API**: [http://localhost:15000/swagger](http://localhost:15000/swagger)
 
 ### Option 2: Manual Run
 1. Start PostgreSQL.
