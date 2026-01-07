@@ -20,7 +20,7 @@ services:
 
   schoolas-web:
     build:
-      context: ./SchoolAs.Web
+      context: ../School_AS_Frontend
       dockerfile: Dockerfile
     ports:
       - "3000:80"
